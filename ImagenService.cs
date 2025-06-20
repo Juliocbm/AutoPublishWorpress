@@ -41,47 +41,85 @@ namespace PublishBlogWordpress
 
         public async Task<string> GenerateAndUploadAsync(string prompt, string filename)
         {
-            var body = new
-            {
-                prompt = prompt,
-                n = 1,
-                size = "512x512"
-            };
+            // 1. Llama a OpenAI para generar la imagen
+            var body = new { prompt, n = 1, size = "512x512" };
+            var response = await _openAI.PostAsJsonAsync("https://api.openai.com/v1/images/generations", body);
+            var json = await response.Content.ReadAsStringAsync();
 
-            var resp = await _openAI.PostAsJsonAsync("https://api.openai.com/v1/images/generations", body);
-            var json = await resp.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+                throw new ApplicationException($"OpenAI image error {response.StatusCode}: {json}");
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApplicationException($"OpenAI image error {resp.StatusCode}: {json}");
+            var url = JsonDocument.Parse(json).RootElement.GetProperty("data")[0].GetProperty("url").GetString();
+            if (string.IsNullOrWhiteSpace(url))
+                throw new ApplicationException("La URL de la imagen generada está vacía.");
 
-            using var doc = JsonDocument.Parse(json);
-            var url = doc.RootElement.GetProperty("data")[0].GetProperty("url").GetString();
-            if (string.IsNullOrEmpty(url))
-                throw new ApplicationException("OpenAI image URL missing");
-
+            // 2. Descargar la imagen
             using var httpNoAuth = new HttpClient();
             var imageBytes = await httpNoAuth.GetByteArrayAsync(url);
 
-            var uploadReq = new HttpRequestMessage(HttpMethod.Post, "/wp-json/wp/v2/media");
-            uploadReq.Content = new ByteArrayContent(imageBytes);
-            uploadReq.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+            // 3. Crear multipart/form-data correctamente con el campo `file`
+            var multipartContent = new MultipartFormDataContent();
+            var fileContent = new ByteArrayContent(imageBytes);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+            multipartContent.Add(fileContent, "file", $"{filename}.png");
 
-            // ✅ CORRECTO: Content-Disposition debe estar en Content.Headers
-            uploadReq.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-            {
-                FileName = $"{filename}.png"
-            };
+            // 4. POST al endpoint de medios
+            var uploadResponse = await _wp.PostAsync("/wp-json/wp/v2/media", multipartContent);
+            var uploadJson = await uploadResponse.Content.ReadAsStringAsync();
 
-            uploadReq.Headers.Accept.Clear();
-            uploadReq.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+            if (!uploadResponse.IsSuccessStatusCode)
+                throw new ApplicationException($"Error al subir la imagen: {uploadResponse.StatusCode} - {uploadJson}");
 
-            var uploadResp = await _wp.SendAsync(uploadReq);
-            var uploadBody = await uploadResp.Content.ReadAsStringAsync();
-            if (!uploadResp.IsSuccessStatusCode)
-                throw new ApplicationException($"Error subiendo imagen: {uploadResp.StatusCode} {uploadBody}"); //Error actual necesario revisar:{"code":"rest_upload_sideload_error","message":"Lo siento, no tienes permisos para subir este tipo de archivo.","data":{"status":500}}
-
-            using var docUpload = JsonDocument.Parse(uploadBody);
-            return docUpload.RootElement.GetProperty("source_url").GetString()!;
+            var doc = JsonDocument.Parse(uploadJson);
+            return doc.RootElement.GetProperty("source_url").GetString()!;
         }
+
+
+
+
+        //public async Task<string> GenerateAndUploadAsync(string prompt, string filename)
+        //{
+        //    var body = new
+        //    {
+        //        prompt = prompt,
+        //        n = 1,
+        //        size = "512x512"
+        //    };
+
+        //    var resp = await _openAI.PostAsJsonAsync("https://api.openai.com/v1/images/generations", body);
+        //    var json = await resp.Content.ReadAsStringAsync();
+
+        //    if (!resp.IsSuccessStatusCode)
+        //        throw new ApplicationException($"OpenAI image error {resp.StatusCode}: {json}");
+
+        //    using var doc = JsonDocument.Parse(json);
+        //    var url = doc.RootElement.GetProperty("data")[0].GetProperty("url").GetString();
+        //    if (string.IsNullOrEmpty(url))
+        //        throw new ApplicationException("OpenAI image URL missing");
+
+        //    using var httpNoAuth = new HttpClient();
+        //    var imageBytes = await httpNoAuth.GetByteArrayAsync(url);
+
+        //    var uploadReq = new HttpRequestMessage(HttpMethod.Post, "/wp-json/wp/v2/media");
+        //    uploadReq.Content = new ByteArrayContent(imageBytes);
+        //    uploadReq.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+
+        //    // ✅ CORRECTO: Content-Disposition debe estar en Content.Headers
+        //    uploadReq.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+        //    {
+        //        FileName = $"{filename}.png"
+        //    };
+
+        //    uploadReq.Headers.Accept.Clear();
+        //    uploadReq.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+
+        //    var uploadResp = await _wp.SendAsync(uploadReq);
+        //    var uploadBody = await uploadResp.Content.ReadAsStringAsync();
+        //    if (!uploadResp.IsSuccessStatusCode)
+        //        throw new ApplicationException($"Error subiendo imagen: {uploadResp.StatusCode} {uploadBody}"); //Error actual necesario revisar:{"code":"rest_upload_sideload_error","message":"Lo siento, no tienes permisos para subir este tipo de archivo.","data":{"status":500}}
+
+        //    using var docUpload = JsonDocument.Parse(uploadBody);
+        //    return docUpload.RootElement.GetProperty("source_url").GetString()!;
+        //}
     }
 }
