@@ -12,18 +12,21 @@ namespace PublishBlogWordpress
     public class OpenAISettings
     {
         public string ApiKey { get; set; } = string.Empty;
+        public string Model { get; set; } = "gpt-4o-mini";
     }
 
     public class ChatGptService
     {
         private readonly HttpClient _http;
         private readonly string _apiKey;
-        private const string MODEL = "gpt-4o-mini"; // modelo válido
+        private readonly string _model;
 
         public ChatGptService(IHttpClientFactory factory, IOptions<OpenAISettings> opts)
         {
             _http = factory.CreateClient();
-            _apiKey = opts.Value.ApiKey;
+            var cfg = opts.Value;
+            _apiKey = cfg.ApiKey;
+            _model = cfg.Model;
             _http.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", _apiKey);
         }
@@ -34,7 +37,7 @@ namespace PublishBlogWordpress
 
             var body = new
             {
-                model = MODEL,
+                model = _model,
                 messages = new[] { new { role = "user", content = prompt } },
                 max_tokens = 200
             };
@@ -83,7 +86,7 @@ Sin explicación adicional, sin comillas triples ni texto fuera del JSON.
 
             var body = new
             {
-                model = MODEL,
+                model = _model,
                 messages = new[] { new { role = "user", content = prompt } },
                 max_tokens = 1000
             };

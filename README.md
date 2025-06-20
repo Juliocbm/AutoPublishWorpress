@@ -39,3 +39,7 @@ dotnet run --project PublishBlogWordpress.csproj
 ```
 
 The service will start fetching trending topics and posting to WordPress every few hours.
+
+## License
+
+Released under the [MIT License](LICENSE).
