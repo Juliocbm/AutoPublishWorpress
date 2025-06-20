@@ -1,12 +1,17 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
+using Org.BouncyCastle.Asn1.Ocsp;
+using Org.BouncyCastle.Utilities;
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+//using static Org.BouncyCastle.Bcpg.Attr.ImageAttrib;
+using static System.Net.WebRequestMethods;
 
 namespace PublishBlogWordpress
 {
@@ -54,19 +59,26 @@ namespace PublishBlogWordpress
             if (string.IsNullOrEmpty(url))
                 throw new ApplicationException("OpenAI image URL missing");
 
-            var imageBytes = await _openAI.GetByteArrayAsync(url);
+            using var httpNoAuth = new HttpClient();
+            var imageBytes = await httpNoAuth.GetByteArrayAsync(url);
 
             var uploadReq = new HttpRequestMessage(HttpMethod.Post, "/wp-json/wp/v2/media");
             uploadReq.Content = new ByteArrayContent(imageBytes);
             uploadReq.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+
+            // ✅ CORRECTO: Content-Disposition debe estar en Content.Headers
+            uploadReq.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = $"{filename}.png"
+            };
+
             uploadReq.Headers.Accept.Clear();
             uploadReq.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-            uploadReq.Headers.Add("Content-Disposition", $"attachment; filename=\"{filename}.png\"");
 
             var uploadResp = await _wp.SendAsync(uploadReq);
             var uploadBody = await uploadResp.Content.ReadAsStringAsync();
             if (!uploadResp.IsSuccessStatusCode)
-                throw new ApplicationException($"Error subiendo imagen: {uploadResp.StatusCode} {uploadBody}");
+                throw new ApplicationException($"Error subiendo imagen: {uploadResp.StatusCode} {uploadBody}"); //{"code":"rest_upload_sideload_error","message":"Lo siento, no tienes permisos para subir este tipo de archivo.","data":{"status":500}}
 
             using var docUpload = JsonDocument.Parse(uploadBody);
             return docUpload.RootElement.GetProperty("source_url").GetString()!;

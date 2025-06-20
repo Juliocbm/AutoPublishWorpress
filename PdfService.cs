@@ -46,7 +46,7 @@ namespace PublishBlogWordpress
             var doc = new Document(pdfDoc);
 
             // Título
-            doc.Add(new Paragraph("Contenido del Post").SetBold().SetFontSize(16));
+            //doc.Add(new Paragraph("Contenido del Post").SetBold().SetFontSize(16));
             // Cuerpo (simple)
             doc.Add(new Paragraph(htmlContent));
             // Banner de texto simulando anuncio
