@@ -176,34 +176,6 @@ namespace PublishBlogWordpress
             var slug = gp.Title.ToLowerInvariant().Replace(" ", "-");
             var pdfUrl = await GenerateAndUploadPdfAsync(gp.Content, slug);
 
-            // 3) Contenido enriquecido (banner AdSense + contador)
-            //var enhancedContent = $@"
-            //    <!-- banner_inicio -->
-            //    <ins class=""adsbygoogle""
-            //         style=""display:block""
-            //         data-ad-client=""ca-pub-9450730864089238""
-            //         data-ad-slot=""5261285091""
-            //         data-ad-format=""auto""
-            //         data-full-width-responsive=""true""></ins>
-            //    <script>
-            //         (adsbygoogle = window.adsbygoogle || []).push({{}});
-            //    </script>
-
-
-            //    {gp.Content}
-
-            //    <button id='dlBtn'>Descargar PDF</button>
-            //    <script>
-            //        document.getElementById('dlBtn').onclick = () => {{
-            //            let c = 5;
-            //            const btn = document.getElementById('dlBtn');
-            //            const i = setInterval(() => {{
-            //                if (c-- === 0) window.location.href = '{pdfUrl}';
-            //                else btn.textContent = 'Descarga en ' + c + 's';
-            //            }}, 1000);
-            //        }};
-            //    </script>";
-
             var enhancedContent = $@"
                 {gp.Content}
 

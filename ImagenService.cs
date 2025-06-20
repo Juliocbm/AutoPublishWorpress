@@ -73,53 +73,5 @@ namespace PublishBlogWordpress
             var doc = JsonDocument.Parse(uploadJson);
             return doc.RootElement.GetProperty("source_url").GetString()!;
         }
-
-
-
-
-        //public async Task<string> GenerateAndUploadAsync(string prompt, string filename)
-        //{
-        //    var body = new
-        //    {
-        //        prompt = prompt,
-        //        n = 1,
-        //        size = "512x512"
-        //    };
-
-        //    var resp = await _openAI.PostAsJsonAsync("https://api.openai.com/v1/images/generations", body);
-        //    var json = await resp.Content.ReadAsStringAsync();
-
-        //    if (!resp.IsSuccessStatusCode)
-        //        throw new ApplicationException($"OpenAI image error {resp.StatusCode}: {json}");
-
-        //    using var doc = JsonDocument.Parse(json);
-        //    var url = doc.RootElement.GetProperty("data")[0].GetProperty("url").GetString();
-        //    if (string.IsNullOrEmpty(url))
-        //        throw new ApplicationException("OpenAI image URL missing");
-
-        //    using var httpNoAuth = new HttpClient();
-        //    var imageBytes = await httpNoAuth.GetByteArrayAsync(url);
-
-        //    var uploadReq = new HttpRequestMessage(HttpMethod.Post, "/wp-json/wp/v2/media");
-        //    uploadReq.Content = new ByteArrayContent(imageBytes);
-        //    uploadReq.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-
-        //    // ✅ CORRECTO: Content-Disposition debe estar en Content.Headers
-        //    uploadReq.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-        //    {
-        //        FileName = $"{filename}.png"
-        //    };
-
-        //    uploadReq.Headers.Accept.Clear();
-        //    uploadReq.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-
-        //    var uploadResp = await _wp.SendAsync(uploadReq);
-        //    var uploadBody = await uploadResp.Content.ReadAsStringAsync();
-        //    if (!uploadResp.IsSuccessStatusCode)
-        //        throw new ApplicationException($"Error subiendo imagen: {uploadResp.StatusCode} {uploadBody}"); //Error actual necesario revisar:{"code":"rest_upload_sideload_error","message":"Lo siento, no tienes permisos para subir este tipo de archivo.","data":{"status":500}}
-
-        //    using var docUpload = JsonDocument.Parse(uploadBody);
-        //    return docUpload.RootElement.GetProperty("source_url").GetString()!;
-        //}
     }
 }
