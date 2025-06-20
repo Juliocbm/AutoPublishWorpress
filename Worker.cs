@@ -1,21 +1,23 @@
+using PdfTutorialsFree.Services;
+
 namespace PublishBlogWordpress
 {
     public class TrendingPostWorker : BackgroundService
     {
         readonly ChatGptService _chat;
         readonly WordPressService _wp;
-        readonly ImagenService _img;
+        readonly IWordPressMediaService _media;
         readonly ILogger<TrendingPostWorker> _log;
 
         public TrendingPostWorker(
             ChatGptService chat,
             WordPressService wp,
-            ImagenService img,
+            IWordPressMediaService media,
             ILogger<TrendingPostWorker> log)
         {
             _chat = chat;
             _wp = wp;
-            _img = img;
+            _media = media;
             _log = log;
         }
 
@@ -34,7 +36,7 @@ namespace PublishBlogWordpress
                         _log.LogInformation("Generando post para tema: {Tema}", t);
                         var gp = await _chat.GeneratePostAsync(t);
                         var slug = gp.Title.ToLowerInvariant().Replace(" ", "-");
-                        var imgUrl = await _img.GenerateAndUploadAsync(gp.Title, slug);
+                        var imgUrl = await _media.GenerateAndUploadAsync(gp.Title, slug);
                         gp.Content = $"<img src='{imgUrl}' alt='{gp.Title}' />\n" + gp.Content;
                         await _wp.CreatePostAsync(gp);
                         _log.LogInformation("Publicado: {Title}", gp.Title);

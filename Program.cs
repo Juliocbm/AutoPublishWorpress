@@ -1,4 +1,5 @@
 using PublishBlogWordpress;
+using PdfTutorialsFree.Services;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((ctx, services) =>
@@ -9,8 +10,16 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.Configure<WordPressSettings>(ctx.Configuration.GetSection("WordPress"));
 
         services.AddHttpClient(); // para llamar API de WP y OpenAI
+        services.AddWordPressMedia(
+            openAI => openAI.ApiKey = ctx.Configuration["OpenAI:ApiKey"] ?? string.Empty,
+            wordpress =>
+            {
+                wordpress.BaseUrl = ctx.Configuration["WordPress:SiteUrl"] ?? string.Empty;
+                wordpress.Username = ctx.Configuration["WordPress:Username"] ?? string.Empty;
+                wordpress.AppPassword = ctx.Configuration["WordPress:AppPassword"] ?? string.Empty;
+            });
+
         services.AddSingleton<ChatGptService>();
-        services.AddSingleton<ImagenService>();
         services.AddSingleton<WordPressService>();
         services.AddHostedService<TrendingPostWorker>();
     })
