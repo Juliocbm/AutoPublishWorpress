@@ -1,5 +1,7 @@
 using PublishBlogWordpress;
 using PdfTutorialsFree.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((ctx, services) =>
@@ -9,7 +11,6 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.Configure<OpenAISettings>(ctx.Configuration.GetSection("OpenAI"));
         services.Configure<WordPressSettings>(ctx.Configuration.GetSection("WordPress"));
 
-        services.AddHttpClient(); // para llamar API de WP y OpenAI
         services.AddWordPressMedia(
             openAI => openAI.ApiKey = ctx.Configuration["OpenAI:ApiKey"] ?? string.Empty,
             wordpress =>
