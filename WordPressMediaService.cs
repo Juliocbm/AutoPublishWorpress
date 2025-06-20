@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -9,8 +9,18 @@ using Microsoft.Extensions.Options;
 
 namespace PdfTutorialsFree.Services
 {
-    public record OpenAIOptions(string ApiKey, string Endpoint = "https://api.openai.com/v1/images/generations");
-    public record WordPressOptions(string BaseUrl, string Username, string AppPassword);
+    public class OpenAIOptions
+    {
+        public string ApiKey { get; set; } = string.Empty;
+        public string Endpoint { get; set; } = "https://api.openai.com/v1/images/generations";
+    }
+
+    public class WordPressOptions
+    {
+        public string BaseUrl { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
+        public string AppPassword { get; set; } = string.Empty;
+    }
 
     public interface IWordPressMediaService
     {

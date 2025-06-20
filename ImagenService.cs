@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Org.BouncyCastle.Asn1.Ocsp;
 using Org.BouncyCastle.Utilities;
 using System;
