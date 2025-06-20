@@ -68,11 +68,11 @@ namespace PublishBlogWordpress
         public async Task<GeneratedPost> GeneratePostAsync(string topic)
         {
             var prompt = $@"
-Eres un experto redactor SEO. Para el tema ""{topic}"":
-1. Sugiéreme una categoría única.
-2. Dame 5 tags SEO.
-3. Crea un título llamativo de máximo 70 caracteres.
-4. Redacta un artículo de ~500 palabras en HTML.
+Eres un experto redactor SEO y de periodismo digital. Para el tema ""{topic}"":
+1. Sugiere la categoría más habitual en blogs que encaje con el tema (evita nombres extraños).
+2. Proporciona 5 tags optimizados para SEO.
+3. Escribe un título muy llamativo y sensacionalista al estilo clickbait, máximo 70 caracteres.
+4. Redacta un artículo de unas 500 palabras en español, con tono amigable y ofreciendo información relevante e interesante. Usa HTML sencillo.
 
 RESPONDE ÚNICAMENTE con un objeto JSON con estas llaves:
 {{

@@ -73,6 +73,10 @@ namespace PublishBlogWordpress
             if (found != null)
                 return found.Id;
 
+            // Si hay resultados de búsqueda, reutiliza la primera categoría encontrada
+            if (list.Count > 0)
+                return list[0].Id;
+
             // 2) Crear la categoría si no existe
             var payload = new { name };
             var postReq = new HttpRequestMessage(HttpMethod.Post, "/wp-json/wp/v2/categories")

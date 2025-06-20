@@ -18,8 +18,8 @@ namespace PublishBlogWordpress
 
         protected override async Task ExecuteAsync(CancellationToken ct)
         {
-            // Intervalo: cada 6 horas
-            var intervalo = TimeSpan.FromHours(6);
+            // Intervalo: cada 4 horas
+            var intervalo = TimeSpan.FromHours(4);
             while (!ct.IsCancellationRequested)
             {
                 try
