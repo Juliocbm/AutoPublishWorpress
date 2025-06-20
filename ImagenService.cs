@@ -78,7 +78,7 @@ namespace PublishBlogWordpress
             var uploadResp = await _wp.SendAsync(uploadReq);
             var uploadBody = await uploadResp.Content.ReadAsStringAsync();
             if (!uploadResp.IsSuccessStatusCode)
-                throw new ApplicationException($"Error subiendo imagen: {uploadResp.StatusCode} {uploadBody}"); //{"code":"rest_upload_sideload_error","message":"Lo siento, no tienes permisos para subir este tipo de archivo.","data":{"status":500}}
+                throw new ApplicationException($"Error subiendo imagen: {uploadResp.StatusCode} {uploadBody}"); //Error actual necesario revisar:{"code":"rest_upload_sideload_error","message":"Lo siento, no tienes permisos para subir este tipo de archivo.","data":{"status":500}}
 
             using var docUpload = JsonDocument.Parse(uploadBody);
             return docUpload.RootElement.GetProperty("source_url").GetString()!;
