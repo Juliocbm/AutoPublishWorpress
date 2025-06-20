@@ -38,7 +38,7 @@ namespace PublishBlogWordpress
                 }
                 catch (Exception ex)
                 {
-                    _log.LogError(ex, "Error en ciclo de publicación");
+                    _log.LogError(ex, "Error en ciclo de publicaciÃ³n");
                 }
 
                 _log.LogInformation("Esperando {Intervalo} para siguiente corrida", intervalo);
