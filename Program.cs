@@ -10,6 +10,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         services.AddHttpClient(); // para llamar API de WP y OpenAI
         services.AddSingleton<ChatGptService>();
+        services.AddSingleton<ImagenService>();
         services.AddSingleton<WordPressService>();
         services.AddHostedService<TrendingPostWorker>();
     })
