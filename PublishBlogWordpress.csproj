@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -6,10 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dotnet-PublishBlogWordpress-e1fd47d5-a305-4dd1-96b7-f6ef54adc7c1</UserSecretsId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="PdfService.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
